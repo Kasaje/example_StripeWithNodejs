@@ -52,6 +52,26 @@ app.post("/api/checkout", express.json(), async (req, res) => {
   });
 });
 
+app.post("/webhook", express.json({ type: "application/json" }), (req, res) => {
+  const event = req.body;
+
+  // Handle the event
+  switch (event.type) {
+    case "checkout.session.completed":
+      const paymentData = event.data.object;
+      console.log("paymentData", paymentData);
+      break;
+    case "payment_method.attached":
+      const paymentMethod = event.data.object;
+      break;
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  // Return a response to acknowledge receipt of the event
+  res.json({ received: true });
+});
+
 app.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`);
 });
