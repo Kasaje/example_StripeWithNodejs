@@ -87,9 +87,7 @@ app.get("/checkPayment", express.json(), async (req, res) => {
 });
 
 app.post("/refund", express.json(), async (req, res) => {
-  const stripe = require("stripe")(
-    "sk_test_51QckiZBDPPQahNn5gDHSqoEspM5doF4PgBLeIIGSgnGVRGJPqRqiJYOS6W7npwdV78z9VQ9r6uqibMB9epKAygPc007hNCq1Ll"
-  );
+  const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
   const refund = await stripe.refunds.create({
     charge: req.body.chargeID,
   });
