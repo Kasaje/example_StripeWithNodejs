@@ -34,6 +34,9 @@ app.post("/api/checkout", express.json(), async (req, res) => {
           currency: "thb",
           product_data: {
             name: product.name,
+            images: [
+              "https://static1.cbrimages.com/wordpress/wp-content/uploads/2023/05/minato-s-kunai-naruto.jpg",
+            ],
           },
           unit_amount: product.price * 100,
         },
@@ -45,6 +48,7 @@ app.post("/api/checkout", express.json(), async (req, res) => {
     cancel_url: `http://localhost:3333/cancel.html`,
   });
 
+  console.log("session => ", session);
   res.json({
     user,
     product,
@@ -70,6 +74,29 @@ app.post("/webhook", express.json({ type: "application/json" }), (req, res) => {
 
   // Return a response to acknowledge receipt of the event
   res.json({ received: true });
+});
+
+app.get("/checkPayment", express.json(), async (req, res) => {
+  const paymentIntent = await stripe.paymentIntents.retrieve(
+    req.body.paymentID
+  );
+
+  res.json({
+    paymentIntent,
+  });
+});
+
+app.post("/refund", express.json(), async (req, res) => {
+  const stripe = require("stripe")(
+    "sk_test_51QckiZBDPPQahNn5gDHSqoEspM5doF4PgBLeIIGSgnGVRGJPqRqiJYOS6W7npwdV78z9VQ9r6uqibMB9epKAygPc007hNCq1Ll"
+  );
+  const refund = await stripe.refunds.create({
+    charge: req.body.chargeID,
+  });
+
+  res.json({
+    refund,
+  });
 });
 
 app.listen(PORT, () => {
